@@ -1,92 +1,78 @@
 -- Query 1: Retrieve all books and their authors
-SELECT b.title, a.author_name
-FROM books b
-JOIN authors a ON b.author_id = a.author_id;
+SELECT title, author_name FROM books
+JOIN authors ON books.author_id = authors.author_id;
 
 -- Query 2: Calculate the total number of books in each category
-SELECT c.category_name, COUNT(bc.book_id) AS total_books
-FROM categories c
-LEFT JOIN book_categories bc ON c.category_id = bc.category_id
-GROUP BY c.category_name;
+SELECT categories.category_name, COUNT(book_categories.book_id) AS total_books FROM categories
+LEFT JOIN book_categories ON categories.category_id = book_categories.category_id
+GROUP BY categories.category_name;
 
 -- Query 3: Find the top 5 bestselling books by quantity
-SELECT b.title, SUM(oi.quantity) AS total_sold
-FROM books b
-JOIN order_items oi ON b.book_id = oi.book_id
-GROUP BY b.title
-ORDER BY total_sold DESC
-LIMIT 5;
+SELECT books.title, SUM(order_items.quantity) AS total_sold FROM books
+JOIN order_items ON books.book_id = order_items.book_id
+GROUP BY books.title
+ORDER BY total_sold DESC LIMIT 5;
 
 -- Query 4: Retrieve customers who have placed orders
-SELECT DISTINCT c.first_name, c.last_name
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id;
+SELECT DISTINCT customers.first_name, customers.last_name
+FROM customers
+JOIN orders ON customers.customer_id = orders.customer_id;
 
 -- Query 5: Calculate total sales revenue by month
-SELECT DATE_FORMAT(o.order_date, '%Y-%m') AS month_year, SUM(b.price * oi.quantity) AS total_revenue
-FROM orders o
-JOIN order_items oi ON o.order_id = oi.order_id
-JOIN books b ON oi.book_id = b.book_id
+SELECT DATE_FORMAT(orders.order_date, '%Y-%m') AS month_year, SUM(books.price * order_items.quantity) AS total_revenue FROM orders
+JOIN order_items ON orders.order_id = order_items.order_id
+JOIN books ON order_items.book_id = books.book_id
 GROUP BY month_year
 ORDER BY month_year;
 
 -- Query 6: Find customers who have spent the most on books
-SELECT c.first_name, c.last_name, SUM(b.price * oi.quantity) AS total_spent
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-JOIN order_items oi ON o.order_id = oi.order_id
-JOIN books b ON oi.book_id = b.book_id
-GROUP BY c.customer_id
+SELECT customers.first_name, customers.last_name, SUM(books.price * order_items.quantity) AS total_spent FROM customers
+JOIN orders ON customers.customer_id = orders.customer_id
+JOIN order_items ON orders.order_id = order_items.order_id
+JOIN books ON order_items.book_id = books.book_id
+GROUP BY customers.customer_id
 ORDER BY total_spent DESC
 LIMIT 1;
 
 -- Query 7: List books priced above $50
-SELECT title, price
-FROM books
+SELECT title, price FROM books
 WHERE price > 50;
 
 -- Query 8: Retrieve books written by a specific author
-SELECT b.title
-FROM books b
-JOIN authors a ON b.author_id = a.author_id
-WHERE a.author_name = 'J.K. Rowling';
+SELECT books.title FROM books
+JOIN authors ON books.author_id = authors.author_id
+WHERE authors.author_name = 'J.K. Rowling';
 
 -- Query 9: Identify customers who have ordered a specific book
-SELECT c.first_name, c.last_name
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-JOIN order_items oi ON o.order_id = oi.order_id
-WHERE oi.book_id = 1;
+SELECT customers.first_name, customers.last_name FROM customers
+JOIN orders ON customers.customer_id = orders.customer_id
+JOIN order_items ON orders.order_id = order_items.order_id
+WHERE order_items.book_id = 1;
 
 -- Query 10: Calculate average book price per category
-SELECT c.category_name, AVG(b.price) AS avg_price
-FROM categories c
-JOIN book_categories bc ON c.category_id = bc.category_id
-JOIN books b ON bc.book_id = b.book_id
-GROUP BY c.category_name;
+SELECT categories.category_name, AVG(b.price) AS avg_price FROM categories
+JOIN book_categories ON categories.category_id = book_categories.category_id
+JOIN books ON book_categories.book_id = books.book_id
+GROUP BY categories.category_name;
 
 -- List Authors and Their Published Books:
-SELECT a.author_name, GROUP_CONCAT(b.title ORDER BY b.title) AS published_books
-FROM authors a
-JOIN books b ON a.author_id = b.author_id
-GROUP BY a.author_name;
+SELECT authors.author_name, GROUP_CONCAT(books.title ORDER BY books.title) AS published_books FROM authors
+JOIN books ON authors.author_id = books.author_id
+GROUP BY authors.author_name;
 
 -- Find Customers Who Have Not Placed Orders:
-SELECT c.first_name, c.last_name
-FROM customers c
-LEFT JOIN orders o ON c.customer_id = o.customer_id
-WHERE o.order_id IS NULL;
+SELECT customers.first_name, customers.last_name FROM customers
+LEFT JOIN orders ON customers.customer_id = orders.customer_id
+WHERE orders.order_id IS NULL;
 
 -- List Categories and Their Books:
-SELECT c.category_name, GROUP_CONCAT(b.title ORDER BY b.title) AS books_in_category
-FROM categories c
-LEFT JOIN book_categories bc ON c.category_id = bc.category_id
-LEFT JOIN books b ON bc.book_id = b.book_id
-GROUP BY c.category_name;
+SELECT categories.category_name, GROUP_CONCAT(books.title ORDER BY books.title) AS books_in_category FROM categories
+LEFT JOIN book_categories ON categories.category_id = book_categories.category_id
+LEFT JOIN books ON book_categories.book_id = books.book_id
+GROUP BY categories.category_name;
 
 -- Calculate Average Order Quantity:
-SELECT AVG(oi.quantity) AS avg_order_quantity
-FROM order_items oi;
+SELECT AVG(quantity) AS avg_order_quantity FROM order_items;
 
 -- Count Orders Placed Each Month:
 SELECT YEAR(order_date) AS year, MONTH(order_date) AS month, COUNT(order_id) AS order_count
@@ -94,10 +80,4 @@ FROM orders
 WHERE YEAR(order_date) = 2023  -- Specify the desired year
 GROUP BY year, month
 ORDER BY year, month;
-
--- Identify Categories with No Books:
-SELECT c.category_name
-FROM categories c
-LEFT JOIN book_categories bc ON c
-
 
