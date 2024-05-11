@@ -50,7 +50,7 @@ JOIN order_items ON orders.order_id = order_items.order_id
 WHERE order_items.book_id = 1;
 
 -- Query 10: Calculate average book price per category
-SELECT categories.category_name, AVG(b.price) AS avg_price FROM categories
+SELECT categories.category_name, AVG(books.price) AS avg_price FROM categories
 JOIN book_categories ON categories.category_id = book_categories.category_id
 JOIN books ON book_categories.book_id = books.book_id
 GROUP BY categories.category_name;
